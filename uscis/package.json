@@ -1,0 +1,60 @@
+{
+  "_args": [
+    [
+      "uscis@0.0.4",
+      "/mnt/d/uscis-craw"
+    ]
+  ],
+  "_from": "uscis@0.0.4",
+  "_id": "uscis@0.0.4",
+  "_inBundle": false,
+  "_integrity": "sha1-KTDWZqMoJ9hUB7B+okqnREvDXRQ=",
+  "_location": "/uscis",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "uscis@0.0.4",
+    "name": "uscis",
+    "escapedName": "uscis",
+    "rawSpec": "0.0.4",
+    "saveSpec": null,
+    "fetchSpec": "0.0.4"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/uscis/-/uscis-0.0.4.tgz",
+  "_spec": "0.0.4",
+  "_where": "/mnt/d/uscis-craw",
+  "bin": {
+    "uscis": "./bin/uscis"
+  },
+  "bugs": {
+    "url": "https://github.com/fuqcool/uscis/issues"
+  },
+  "dependencies": {
+    "colors": "^1.1.2",
+    "jsdom": "^7.2.2",
+    "minimist": "^1.2.0",
+    "request": "^2.67.0"
+  },
+  "description": "Query your USCIS case status",
+  "homepage": "https://github.com/fuqcool/uscis#readme",
+  "keywords": [
+    "USCIS",
+    "H1B",
+    "OPT",
+    "status",
+    "query",
+    "case"
+  ],
+  "license": "MIT",
+  "main": "./lib/case-status",
+  "name": "uscis",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fuqcool/uscis.git"
+  },
+  "version": "0.0.4"
+}

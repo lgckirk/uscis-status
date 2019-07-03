@@ -1,5 +1,5 @@
 
-const uscis = require('uscis');
+const uscis = require('./uscis/lib/case-status');
 const _ = require('underscore');
  
 
