@@ -1,0 +1,17 @@
+{
+  "name": "uscis-craw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "underscore": "^1.9.1",
+    "uscis": "^0.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Gaochang, Li",
+  "license": "MIT"
+}
