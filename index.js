@@ -5,7 +5,7 @@ const _ = require('underscore');
 
 // config params
 const MAX_CONCURRENT_REQUEST = 6;
-const RANGE_TO_SEARCH = 2000;
+const RANGE_TO_SEARCH = 10;
 const MY_RECEIPT_NUM = 1990205965;
 const RECEIPT_PREFIX = 'YSC';
 const FILTER_765 = true;
@@ -16,6 +16,7 @@ const PRINT_FILTER_MSG = false;
 let requestQueue = [];
 let result = {};
 let range = RANGE_TO_SEARCH;
+const failedQueries = [];
 
 
 (function run() {
@@ -29,14 +30,16 @@ let range = RANGE_TO_SEARCH;
         }
 
         const fullReceipt = `${RECEIPT_PREFIX}${MY_RECEIPT_NUM-range}`;
-        const req = uscis(fullReceipt);
+        const request = safeProbe(fullReceipt, (status) => {
+            updateResult(fullReceipt, status);
+        }, (error) => {
+            updateResult(fullReceipt, null);
+            failedQueries.push(fullReceipt);
+        });
         range--;
         endingNum++;
-    
-        requestQueue.push(req);
-        req.then((status) => {
-            updateResult(fullReceipt, status);
-        });
+
+        requestQueue.push(request);
     });
     
     Promise.all(requestQueue).then(() => {
@@ -48,6 +51,15 @@ let range = RANGE_TO_SEARCH;
             // start another series of requests
             requestQueue = [];
             run();
+        } else {
+            // finish with a summary
+            const start = MY_RECEIPT_NUM - RANGE_TO_SEARCH;
+            const end = MY_RECEIPT_NUM;
+            console.log('\n\n############################################');
+            console.log(`Processed status ${RECEIPT_PREFIX}${start} to ${RECEIPT_PREFIX}${end}.`);
+            console.log(`${failedQueries.length} queries have failed:`);
+            console.log(failedQueries);
+            console.log('############################################');
         }
     });
 })();
@@ -76,25 +88,47 @@ function printStatus(start, end) {
 }
 
 // process status and apply filter
+// status can be null, in which case it will add an 'unavailable' msg
 function updateResult(fullReceipt, status) {
-    const title = status.title;
-    const details = status.details;
-
     function clearAndAppend(msg) {
         if (!status.hasOwnProperty('filter')) {
             status = { 'filter': [] };
         }
         status['filter'].push(msg);
     }
-
-    if (FILTER_765 && details.indexOf('Form I-765') < 0) {
-        clearAndAppend('Form I-765 Only');
-    }
-    if (FILTER_NO_CASE_RECEIVED && title == 'Case Was Received') {
-        clearAndAppend('Case Received Ignore')
+    
+    if (status) {
+        const title = status.title;
+        const details = status.details;
+        
+        if (FILTER_765 && details.indexOf('Form I-765') < 0) {
+            clearAndAppend('Form I-765 Only');
+        }
+        if (FILTER_NO_CASE_RECEIVED && title == 'Case Was Received') {
+            clearAndAppend('Case Received Ignore')
+        }
+    } else {
+        status = {};
+        clearAndAppend('Status Unavailable');
     }
 
     result[fullReceipt] = status;
 }
 
+// wrapper of the scraper function, with error handling
+// returns a promise, which, always resolves, even when there is an error
+// onResolve: function(statusObject)
+// onReject: function(error)
+function safeProbe(fullReceipt, onResolve, onReject) {
+    return new Promise((resolve, reject) => {
+        const req = uscis(fullReceipt);
+        req.then((status) => {
+            onResolve(status);
+            resolve();
+        }, (error) => {
+            onReject(error);
+            resolve();
+        });
+    });
+}
 
